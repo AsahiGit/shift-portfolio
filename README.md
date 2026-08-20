@@ -19,15 +19,15 @@
 | --- | --- |
 | フレームワーク | Next.js 16 (App Router) / React 19 / TypeScript |
 | スタイリング | Tailwind CSS 4 |
-| DB / ORM | SQLite / Prisma 6 |
+| DB / ORM | PostgreSQL (Neon) / Prisma 6 |
 | 認証 | Auth.js (NextAuth v5) + Credentials Provider / bcryptjs |
 
 ## 技術選定の理由
 
 - **Next.js**: フロントエンドとAPI(Route Handlers)を1つのプロジェクトで完結でき、
   App Router + Server Componentsで認証状態に応じたリダイレクトなどをシンプルに書けるため採用。
-- **Prisma**: スキーマファイルで型安全にDBモデルを定義でき、マイグレーション管理もしやすいため採用。
-  開発時はSQLiteでセットアップコストを抑えている(本番運用時はPostgreSQL等への切り替えを想定)。
+- **Prisma + Neon**: スキーマファイルで型安全にDBモデルを定義でき、マイグレーション管理もしやすいため採用。
+  DBはVercelと親和性の高いNeon(サーバーレスPostgres、無料枠)を使用。
 - **Auth.js (Credentials)**: 自前でパスワードハッシュ管理・認可制御の仕組みを理解して実装したかったため、
   外部OAuthではなくCredentials Providerを選択。
 
@@ -43,12 +43,16 @@
 
 ```bash
 npm install
-cp .env.example .env   # AUTH_SECRET を openssl rand -base64 32 などで生成して設定
+cp .env.example .env   # DATABASE_URL(Postgres接続文字列)とAUTH_SECRETを設定
 npx prisma migrate dev
 npm run dev
 ```
 
 http://localhost:3000 で起動します。
+
+## デプロイ
+
+Vercel + Neon(サーバーレスPostgres)で無料枠のみでデプロイしています。
 
 ## AI活用について
 
