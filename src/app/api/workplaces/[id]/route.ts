@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
+type WageRuleBody = { label: string; startTime: string; endTime: string; rate: number };
+
 async function assertOwnership(userId: string, id: string) {
   const workplace = await prisma.workplace.findUnique({ where: { id } });
   return workplace && workplace.userId === userId ? workplace : null;
@@ -16,7 +18,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (!owned) return NextResponse.json({ error: "not found" }, { status: 404 });
 
   const body = await req.json();
-  const { name, hourlyWage, color, closingDay, nightRate, overtimeRate } = body;
+  const { name, hourlyWage, color, closingDay, payDay, nightRate, overtimeRate, wageRules } = body;
 
   const workplace = await prisma.workplace.update({
     where: { id },
@@ -25,9 +27,22 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       ...(hourlyWage !== undefined && { hourlyWage: Number(hourlyWage) }),
       ...(color !== undefined && { color }),
       ...(closingDay !== undefined && { closingDay: Number(closingDay) }),
+      ...(payDay !== undefined && { payDay: Number(payDay) }),
       ...(nightRate !== undefined && { nightRate: Number(nightRate) }),
       ...(overtimeRate !== undefined && { overtimeRate: Number(overtimeRate) }),
+      ...(Array.isArray(wageRules) && {
+        wageRules: {
+          deleteMany: {},
+          create: (wageRules as WageRuleBody[]).map((r) => ({
+            label: r.label,
+            startTime: r.startTime,
+            endTime: r.endTime,
+            rate: Number(r.rate),
+          })),
+        },
+      }),
     },
+    include: { wageRules: true },
   });
   return NextResponse.json(workplace);
 }

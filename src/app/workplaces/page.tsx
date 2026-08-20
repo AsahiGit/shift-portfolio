@@ -2,14 +2,24 @@
 
 import { useEffect, useState } from "react";
 
+type WageRule = {
+  id?: string;
+  label: string;
+  startTime: string;
+  endTime: string;
+  rate: string;
+};
+
 type Workplace = {
   id: string;
   name: string;
   hourlyWage: number;
   color: string;
   closingDay: number;
+  payDay: number;
   nightRate: number;
   overtimeRate: number;
+  wageRules: WageRule[];
 };
 
 const emptyForm = {
@@ -17,8 +27,10 @@ const emptyForm = {
   hourlyWage: "",
   color: "#0071e3",
   closingDay: "31",
+  payDay: "25",
   nightRate: "1.25",
   overtimeRate: "1.25",
+  wageRules: [] as WageRule[],
 };
 
 const inputClass =
@@ -50,14 +62,34 @@ export default function WorkplacesPage() {
       hourlyWage: String(w.hourlyWage),
       color: w.color,
       closingDay: String(w.closingDay),
+      payDay: String(w.payDay),
       nightRate: String(w.nightRate),
       overtimeRate: String(w.overtimeRate),
+      wageRules: w.wageRules.map((r) => ({ ...r, rate: String(r.rate) })),
     });
   }
 
   function cancelEdit() {
     setEditingId(null);
     setForm(emptyForm);
+  }
+
+  function addRule() {
+    setForm({
+      ...form,
+      wageRules: [...form.wageRules, { label: "", startTime: "17:00", endTime: "22:00", rate: "1.1" }],
+    });
+  }
+
+  function updateRule(index: number, patch: Partial<WageRule>) {
+    setForm({
+      ...form,
+      wageRules: form.wageRules.map((r, i) => (i === index ? { ...r, ...patch } : r)),
+    });
+  }
+
+  function removeRule(index: number) {
+    setForm({ ...form, wageRules: form.wageRules.filter((_, i) => i !== index) });
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -91,76 +123,169 @@ export default function WorkplacesPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="mb-8 grid grid-cols-2 gap-5 rounded-3xl border border-border bg-surface p-8 shadow-[0_2px_20px_rgba(0,0,0,0.04)] sm:grid-cols-3"
+        className="mb-8 rounded-3xl border border-border bg-surface p-8 shadow-[0_2px_20px_rgba(0,0,0,0.04)]"
       >
-        <div className="col-span-2 sm:col-span-1">
-          <label className={labelClass}>バイト先名</label>
-          <input
-            required
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className={inputClass}
-            placeholder="例: セブンイレブン渋谷店"
-          />
+        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
+          <div className="col-span-2 sm:col-span-1">
+            <label className={labelClass}>バイト先名</label>
+            <input
+              required
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              className={inputClass}
+              placeholder="例: セブンイレブン渋谷店"
+            />
+          </div>
+          <div>
+            <label className={labelClass}>時給(円)</label>
+            <input
+              required
+              type="number"
+              min={1}
+              value={form.hourlyWage}
+              onChange={(e) => setForm({ ...form, hourlyWage: e.target.value })}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>カレンダー色</label>
+            <input
+              type="color"
+              value={form.color}
+              onChange={(e) => setForm({ ...form, color: e.target.value })}
+              className="h-[42px] w-full rounded-xl border border-border"
+            />
+          </div>
+          <div>
+            <label className={labelClass}>給料締め日</label>
+            <select
+              value={form.closingDay}
+              onChange={(e) => setForm({ ...form, closingDay: e.target.value })}
+              className={inputClass}
+            >
+              {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                <option key={d} value={d}>
+                  {d}日{d === 31 ? "(月末)" : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelClass}>給料支払日</label>
+            <select
+              value={form.payDay}
+              onChange={(e) => setForm({ ...form, payDay: e.target.value })}
+              className={inputClass}
+            >
+              {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                <option key={d} value={d}>
+                  {d}日{d === 31 ? "(月末)" : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelClass}>深夜割増率(22-5時)</label>
+            <input
+              type="number"
+              step="0.01"
+              min={1}
+              value={form.nightRate}
+              onChange={(e) => setForm({ ...form, nightRate: e.target.value })}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>残業割増率(8h超)</label>
+            <input
+              type="number"
+              step="0.01"
+              min={1}
+              value={form.overtimeRate}
+              onChange={(e) => setForm({ ...form, overtimeRate: e.target.value })}
+              className={inputClass}
+            />
+          </div>
         </div>
-        <div>
-          <label className={labelClass}>時給(円)</label>
-          <input
-            required
-            type="number"
-            min={1}
-            value={form.hourlyWage}
-            onChange={(e) => setForm({ ...form, hourlyWage: e.target.value })}
-            className={inputClass}
-          />
+
+        <div className="mt-6 border-t border-border pt-5">
+          <div className="mb-3 flex items-center justify-between">
+            <label className={labelClass + " mb-0"}>
+              時間帯別の時給ルール(任意・土日料金や特定時間の割増など)
+            </label>
+            <button
+              type="button"
+              onClick={addRule}
+              className="rounded-full px-3 py-1 text-[12px] font-medium text-accent transition-colors hover:bg-accent/10"
+            >
+              + ルールを追加
+            </button>
+          </div>
+          {form.wageRules.length === 0 ? (
+            <p className="text-[12px] text-muted">ルールなし(通常の時給のみ)</p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {form.wageRules.map((rule, i) => (
+                <div key={i} className="grid grid-cols-2 gap-2 sm:grid-cols-5 sm:items-end">
+                  <div className="col-span-2 sm:col-span-2">
+                    <label className={labelClass}>ラベル</label>
+                    <input
+                      required
+                      value={rule.label}
+                      onChange={(e) => updateRule(i, { label: e.target.value })}
+                      placeholder="例: 土日料金"
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>開始</label>
+                    <input
+                      required
+                      type="time"
+                      value={rule.startTime}
+                      onChange={(e) => updateRule(i, { startTime: e.target.value })}
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>終了</label>
+                    <input
+                      required
+                      type="time"
+                      value={rule.endTime}
+                      onChange={(e) => updateRule(i, { endTime: e.target.value })}
+                      className={inputClass}
+                    />
+                  </div>
+                  <div className="flex items-end gap-2">
+                    <div className="flex-1">
+                      <label className={labelClass}>倍率</label>
+                      <input
+                        required
+                        type="number"
+                        step="0.01"
+                        min={1}
+                        value={rule.rate}
+                        onChange={(e) => updateRule(i, { rate: e.target.value })}
+                        className={inputClass}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeRule(i)}
+                      className="rounded-full px-2.5 py-2.5 text-[13px] text-red-500 transition-colors hover:bg-red-50"
+                    >
+                      削除
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-        <div>
-          <label className={labelClass}>カレンダー色</label>
-          <input
-            type="color"
-            value={form.color}
-            onChange={(e) => setForm({ ...form, color: e.target.value })}
-            className="h-[42px] w-full rounded-xl border border-border"
-          />
-        </div>
-        <div>
-          <label className={labelClass}>給料締め日</label>
-          <select
-            value={form.closingDay}
-            onChange={(e) => setForm({ ...form, closingDay: e.target.value })}
-            className={inputClass}
-          >
-            {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
-              <option key={d} value={d}>
-                {d}日{d === 31 ? "(月末)" : ""}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className={labelClass}>深夜割増率(22-5時)</label>
-          <input
-            type="number"
-            step="0.01"
-            min={1}
-            value={form.nightRate}
-            onChange={(e) => setForm({ ...form, nightRate: e.target.value })}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className={labelClass}>残業割増率(8h超)</label>
-          <input
-            type="number"
-            step="0.01"
-            min={1}
-            value={form.overtimeRate}
-            onChange={(e) => setForm({ ...form, overtimeRate: e.target.value })}
-            className={inputClass}
-          />
-        </div>
-        {error && <p className="col-span-full text-[13px] text-red-500">{error}</p>}
-        <div className="col-span-full flex gap-3 pt-1">
+
+        {error && <p className="mt-4 text-[13px] text-red-500">{error}</p>}
+        <div className="mt-5 flex gap-3">
           <button
             type="submit"
             className="rounded-full bg-accent px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-accent-hover"
@@ -198,8 +323,9 @@ export default function WorkplacesPage() {
                 <div>
                   <p className="text-[15px] font-medium">{w.name}</p>
                   <p className="text-[12px] text-muted">
-                    時給{w.hourlyWage}円 / 締め日{w.closingDay}日 / 深夜×
+                    時給{w.hourlyWage}円 / 締め{w.closingDay}日・支払{w.payDay}日 / 深夜×
                     {w.nightRate} / 残業×{w.overtimeRate}
+                    {w.wageRules.length > 0 && ` / 追加ルール${w.wageRules.length}件`}
                   </p>
                 </div>
               </div>

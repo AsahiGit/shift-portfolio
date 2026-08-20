@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { getMonthGrid, isSameDay, toDateKey } from "@/lib/calendar";
 import { calculateShiftWage } from "@/lib/wage";
 import ShiftFormModal, { ShiftFormValues } from "@/components/ShiftFormModal";
+import BulkShiftModal from "@/components/BulkShiftModal";
+
+type WageRule = { label: string; startTime: string; endTime: string; rate: number };
 
 type Workplace = {
   id: string;
@@ -12,6 +15,7 @@ type Workplace = {
   hourlyWage: number;
   nightRate: number;
   overtimeRate: number;
+  wageRules: WageRule[];
 };
 
 type Shift = {
@@ -48,6 +52,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [modalValues, setModalValues] = useState<ShiftFormValues | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [showBulkModal, setShowBulkModal] = useState(false);
 
   const year = monthDate.getFullYear();
   const month = monthDate.getMonth();
@@ -94,6 +99,7 @@ export default function DashboardPage() {
         hourlyWage: s.workplace.hourlyWage,
         nightRate: s.workplace.nightRate,
         overtimeRate: s.workplace.overtimeRate,
+        wageRules: s.workplace.wageRules,
       }).totalPay;
 
       if (s.status === "PLANNED") {
@@ -221,12 +227,20 @@ export default function DashboardPage() {
           <h2 className="text-[17px] font-semibold tracking-tight">
             {year}年{month + 1}月
           </h2>
-          <button
-            onClick={() => setMonthDate(new Date(year, month + 1, 1))}
-            className="rounded-full px-3 py-1.5 text-[13px] font-medium text-muted transition-colors hover:bg-foreground/5 hover:text-foreground"
-          >
-            次月 →
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowBulkModal(true)}
+              className="rounded-full bg-accent/10 px-3 py-1.5 text-[13px] font-medium text-accent transition-colors hover:bg-accent/20"
+            >
+              一括登録
+            </button>
+            <button
+              onClick={() => setMonthDate(new Date(year, month + 1, 1))}
+              className="rounded-full px-3 py-1.5 text-[13px] font-medium text-muted transition-colors hover:bg-foreground/5 hover:text-foreground"
+            >
+              次月 →
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-7 text-center text-[11px] font-medium text-muted">
@@ -296,6 +310,14 @@ export default function DashboardPage() {
           }}
           onSave={handleSave}
           onDelete={editingId ? handleDelete : undefined}
+        />
+      )}
+
+      {showBulkModal && (
+        <BulkShiftModal
+          workplaces={workplaces}
+          onClose={() => setShowBulkModal(false)}
+          onCreated={reloadShifts}
         />
       )}
     </main>

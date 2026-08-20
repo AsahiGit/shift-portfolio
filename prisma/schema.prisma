@@ -27,14 +27,29 @@ model Workplace {
   hourlyWage  Int
   color       String   @default("#3b82f6")
   closingDay  Int      @default(31) // 給料締め日 (1-31、31は月末扱い)
+  payDay      Int      @default(25) // 給料支払日 (1-31、31は月末扱い。締め日の翌月と想定)
   nightRate   Float    @default(1.25) // 深夜割増率 (22:00-5:00に適用)
   overtimeRate Float   @default(1.25) // 残業割増率 (1日8時間超に適用)
   createdAt   DateTime @default(now())
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   shifts      Shift[]
+  wageRules   WageRule[]
 
   @@index([userId])
+}
+
+// 指定した時間帯だけ時給に追加の倍率をかけるルール(例: 土日料金・特定時間の割増など)
+model WageRule {
+  id          String    @id @default(cuid())
+  label       String
+  startTime   String // "17:00" 形式
+  endTime     String // "22:00" 形式
+  rate        Float // 倍率 (1.1 = 10%増し)
+  workplaceId String
+  workplace   Workplace @relation(fields: [workplaceId], references: [id], onDelete: Cascade)
+
+  @@index([workplaceId])
 }
 
 model Shift {

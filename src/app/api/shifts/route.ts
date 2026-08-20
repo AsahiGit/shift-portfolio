@@ -15,7 +15,7 @@ export async function GET(req: Request) {
       userId: session.user.id,
       ...(from && to ? { date: { gte: new Date(from), lte: new Date(to) } } : {}),
     },
-    include: { workplace: true },
+    include: { workplace: { include: { wageRules: true } } },
     orderBy: { date: "asc" },
   });
   return NextResponse.json(shifts);
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
       workplaceId,
       userId: session.user.id,
     },
-    include: { workplace: true },
+    include: { workplace: { include: { wageRules: true } } },
   });
   return NextResponse.json(shift, { status: 201 });
 }

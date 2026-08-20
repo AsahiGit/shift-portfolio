@@ -29,7 +29,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       ...(status !== undefined && { status }),
       ...(workplaceId !== undefined && { workplaceId }),
     },
-    include: { workplace: true },
+    include: { workplace: { include: { wageRules: true } } },
   });
   return NextResponse.json(shift);
 }
