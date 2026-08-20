@@ -32,6 +32,9 @@ export default function Nav() {
             <Link href="/income" className={linkClass("/income")}>
               年間収入
             </Link>
+            <Link href="/friends" className={linkClass("/friends")}>
+              フレンド
+            </Link>
           </div>
         </div>
         <div className="flex items-center gap-4">

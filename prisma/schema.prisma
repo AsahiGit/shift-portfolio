@@ -16,9 +16,32 @@ model User {
   email        String      @unique
   passwordHash String
   name         String
+  friendCode   String      @unique @default(dbgenerated("upper(substr(md5(random()::text), 1, 8))")) // 友達申請用の8桁コード
   createdAt    DateTime    @default(now())
   workplaces   Workplace[]
   shifts       Shift[]
+
+  sentFriendRequests     Friendship[] @relation("FriendshipRequester")
+  receivedFriendRequests Friendship[] @relation("FriendshipAddressee")
+}
+
+model Friendship {
+  id          String           @id @default(cuid())
+  requesterId String
+  requester   User             @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addresseeId String
+  addressee   User             @relation("FriendshipAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+
+  @@unique([requesterId, addresseeId])
+  @@index([requesterId])
+  @@index([addresseeId])
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
 }
 
 model Workplace {
