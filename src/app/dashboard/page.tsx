@@ -170,29 +170,29 @@ export default function DashboardPage() {
   const today = new Date();
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8">
+    <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-10">
       <div className="mb-6 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-xs font-medium text-slate-500">
+        <div className="rounded-3xl border border-border bg-surface p-6 shadow-[0_2px_20px_rgba(0,0,0,0.04)]">
+          <p className="text-[12px] font-medium text-muted">
             {year}年{month + 1}月 確定分の給料
           </p>
-          <p className="mt-1 text-2xl font-bold text-blue-600">
-            {summary.confirmedTotal.toLocaleString()}円
+          <p className="mt-1.5 text-[34px] font-semibold tracking-tight text-foreground">
+            ¥{summary.confirmedTotal.toLocaleString()}
           </p>
           {summary.plannedTotal > 0 && (
-            <p className="mt-1 text-xs text-slate-400">
-              +希望シフト分 {summary.plannedTotal.toLocaleString()}円(未確定)
+            <p className="mt-1 text-[12px] text-muted">
+              +希望シフト分 ¥{summary.plannedTotal.toLocaleString()}(未確定)
             </p>
           )}
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="mb-2 text-xs font-medium text-slate-500">バイト先別内訳</p>
+        <div className="rounded-3xl border border-border bg-surface p-6 shadow-[0_2px_20px_rgba(0,0,0,0.04)]">
+          <p className="mb-3 text-[12px] font-medium text-muted">バイト先別内訳</p>
           {summary.byWorkplace.length === 0 ? (
-            <p className="text-sm text-slate-400">シフトがありません</p>
+            <p className="text-[13px] text-muted">シフトがありません</p>
           ) : (
-            <ul className="flex flex-col gap-1">
+            <ul className="flex flex-col gap-2.5">
               {summary.byWorkplace.map((w) => (
-                <li key={w.name} className="flex items-center justify-between text-sm">
+                <li key={w.name} className="flex items-center justify-between text-[14px]">
                   <span className="flex items-center gap-2">
                     <span
                       className="h-2.5 w-2.5 rounded-full"
@@ -200,7 +200,9 @@ export default function DashboardPage() {
                     />
                     {w.name}
                   </span>
-                  <span>{w.total.toLocaleString()}円</span>
+                  <span className="font-medium tabular-nums">
+                    ¥{w.total.toLocaleString()}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -208,33 +210,33 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="mb-4 flex items-center justify-between">
+      <div className="rounded-3xl border border-border bg-surface p-6 shadow-[0_2px_20px_rgba(0,0,0,0.04)]">
+        <div className="mb-5 flex items-center justify-between">
           <button
             onClick={() => setMonthDate(new Date(year, month - 1, 1))}
-            className="rounded-md px-3 py-1 text-sm hover:bg-slate-100"
+            className="rounded-full px-3 py-1.5 text-[13px] font-medium text-muted transition-colors hover:bg-foreground/5 hover:text-foreground"
           >
             ← 前月
           </button>
-          <h2 className="font-bold">
+          <h2 className="text-[17px] font-semibold tracking-tight">
             {year}年{month + 1}月
           </h2>
           <button
             onClick={() => setMonthDate(new Date(year, month + 1, 1))}
-            className="rounded-md px-3 py-1 text-sm hover:bg-slate-100"
+            className="rounded-full px-3 py-1.5 text-[13px] font-medium text-muted transition-colors hover:bg-foreground/5 hover:text-foreground"
           >
             次月 →
           </button>
         </div>
 
-        <div className="grid grid-cols-7 text-center text-xs font-medium text-slate-500">
+        <div className="grid grid-cols-7 text-center text-[11px] font-medium text-muted">
           {WEEKDAYS.map((w) => (
             <div key={w} className="py-2">
               {w}
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-1.5">
           {grid.map((d) => {
             const key = toDateKey(d);
             const dayShifts = shiftsByDay.get(key) ?? [];
@@ -244,11 +246,19 @@ export default function DashboardPage() {
               <button
                 key={key}
                 onClick={() => openNewShift(d)}
-                className={`min-h-24 rounded-md border p-1 text-left align-top ${
-                  inMonth ? "border-slate-200 bg-white" : "border-slate-100 bg-slate-50"
-                } ${isToday ? "ring-2 ring-blue-400" : ""} hover:bg-blue-50`}
+                className={`min-h-24 rounded-xl p-1.5 text-left align-top transition-colors ${
+                  inMonth ? "bg-background" : "bg-transparent"
+                } hover:bg-accent/5`}
               >
-                <span className={`text-xs ${inMonth ? "text-slate-700" : "text-slate-300"}`}>
+                <span
+                  className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[12px] ${
+                    isToday
+                      ? "bg-accent font-semibold text-white"
+                      : inMonth
+                        ? "text-foreground"
+                        : "text-muted/40"
+                  }`}
+                >
                   {d.getDate()}
                 </span>
                 <div className="mt-1 flex flex-col gap-0.5">
@@ -259,7 +269,7 @@ export default function DashboardPage() {
                         e.stopPropagation();
                         openEditShift(s);
                       }}
-                      className="truncate rounded px-1 py-0.5 text-[10px] text-white"
+                      className="truncate rounded-md px-1.5 py-0.5 text-[10px] font-medium text-white"
                       style={{
                         backgroundColor: s.workplace.color,
                         opacity: s.status === "PLANNED" ? 0.5 : 1,
@@ -273,7 +283,7 @@ export default function DashboardPage() {
             );
           })}
         </div>
-        {loading && <p className="mt-3 text-xs text-slate-400">読み込み中...</p>}
+        {loading && <p className="mt-3 text-[12px] text-muted">読み込み中...</p>}
       </div>
 
       {modalValues && (

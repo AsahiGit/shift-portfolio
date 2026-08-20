@@ -15,11 +15,15 @@ type Workplace = {
 const emptyForm = {
   name: "",
   hourlyWage: "",
-  color: "#3b82f6",
+  color: "#0071e3",
   closingDay: "31",
   nightRate: "1.25",
   overtimeRate: "1.25",
 };
+
+const inputClass =
+  "w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-[14px] outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/20";
+const labelClass = "mb-1.5 block text-[12px] font-medium text-muted";
 
 export default function WorkplacesPage() {
   const [workplaces, setWorkplaces] = useState<Workplace[]>([]);
@@ -82,57 +86,49 @@ export default function WorkplacesPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8">
-      <h1 className="mb-6 text-xl font-bold">バイト先管理</h1>
+    <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-10">
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight">バイト先管理</h1>
 
       <form
         onSubmit={handleSubmit}
-        className="mb-8 grid grid-cols-2 gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:grid-cols-3"
+        className="mb-8 grid grid-cols-2 gap-5 rounded-3xl border border-border bg-surface p-8 shadow-[0_2px_20px_rgba(0,0,0,0.04)] sm:grid-cols-3"
       >
         <div className="col-span-2 sm:col-span-1">
-          <label className="mb-1 block text-xs font-medium text-slate-600">
-            バイト先名
-          </label>
+          <label className={labelClass}>バイト先名</label>
           <input
             required
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className={inputClass}
             placeholder="例: セブンイレブン渋谷店"
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
-            時給(円)
-          </label>
+          <label className={labelClass}>時給(円)</label>
           <input
             required
             type="number"
             min={1}
             value={form.hourlyWage}
             onChange={(e) => setForm({ ...form, hourlyWage: e.target.value })}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className={inputClass}
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
-            カレンダー色
-          </label>
+          <label className={labelClass}>カレンダー色</label>
           <input
             type="color"
             value={form.color}
             onChange={(e) => setForm({ ...form, color: e.target.value })}
-            className="h-9 w-full rounded-md border border-slate-300"
+            className="h-[42px] w-full rounded-xl border border-border"
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
-            給料締め日
-          </label>
+          <label className={labelClass}>給料締め日</label>
           <select
             value={form.closingDay}
             onChange={(e) => setForm({ ...form, closingDay: e.target.value })}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className={inputClass}
           >
             {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
               <option key={d} value={d}>
@@ -142,36 +138,32 @@ export default function WorkplacesPage() {
           </select>
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
-            深夜割増率(22-5時)
-          </label>
+          <label className={labelClass}>深夜割増率(22-5時)</label>
           <input
             type="number"
             step="0.01"
             min={1}
             value={form.nightRate}
             onChange={(e) => setForm({ ...form, nightRate: e.target.value })}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className={inputClass}
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
-            残業割増率(8h超)
-          </label>
+          <label className={labelClass}>残業割増率(8h超)</label>
           <input
             type="number"
             step="0.01"
             min={1}
             value={form.overtimeRate}
             onChange={(e) => setForm({ ...form, overtimeRate: e.target.value })}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className={inputClass}
           />
         </div>
-        {error && <p className="col-span-full text-sm text-red-600">{error}</p>}
-        <div className="col-span-full flex gap-3">
+        {error && <p className="col-span-full text-[13px] text-red-500">{error}</p>}
+        <div className="col-span-full flex gap-3 pt-1">
           <button
             type="submit"
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            className="rounded-full bg-accent px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-accent-hover"
           >
             {editingId ? "更新する" : "追加する"}
           </button>
@@ -179,7 +171,7 @@ export default function WorkplacesPage() {
             <button
               type="button"
               onClick={cancelEdit}
-              className="rounded-md border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-100"
+              className="rounded-full border border-border px-5 py-2.5 text-[14px] text-muted transition-colors hover:bg-foreground/5"
             >
               キャンセル
             </button>
@@ -188,39 +180,39 @@ export default function WorkplacesPage() {
       </form>
 
       {loading ? (
-        <p className="text-sm text-slate-500">読み込み中...</p>
+        <p className="text-[13px] text-muted">読み込み中...</p>
       ) : workplaces.length === 0 ? (
-        <p className="text-sm text-slate-500">バイト先が登録されていません。</p>
+        <p className="text-[13px] text-muted">バイト先が登録されていません。</p>
       ) : (
         <ul className="flex flex-col gap-3">
           {workplaces.map((w) => (
             <li
               key={w.id}
-              className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+              className="flex items-center justify-between rounded-2xl border border-border bg-surface p-5 shadow-[0_2px_20px_rgba(0,0,0,0.04)] transition-shadow hover:shadow-[0_4px_24px_rgba(0,0,0,0.08)]"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3.5">
                 <span
-                  className="h-4 w-4 rounded-full"
+                  className="h-9 w-9 rounded-full"
                   style={{ backgroundColor: w.color }}
                 />
                 <div>
-                  <p className="font-medium">{w.name}</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-[15px] font-medium">{w.name}</p>
+                  <p className="text-[12px] text-muted">
                     時給{w.hourlyWage}円 / 締め日{w.closingDay}日 / 深夜×
                     {w.nightRate} / 残業×{w.overtimeRate}
                   </p>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-1">
                 <button
                   onClick={() => startEdit(w)}
-                  className="rounded-md px-3 py-1 text-sm text-blue-600 hover:bg-blue-50"
+                  className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-accent transition-colors hover:bg-accent/10"
                 >
                   編集
                 </button>
                 <button
                   onClick={() => handleDelete(w.id)}
-                  className="rounded-md px-3 py-1 text-sm text-red-600 hover:bg-red-50"
+                  className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-red-500 transition-colors hover:bg-red-50"
                 >
                   削除
                 </button>

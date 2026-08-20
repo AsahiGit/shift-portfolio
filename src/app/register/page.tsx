@@ -42,21 +42,23 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="flex flex-1 items-center justify-center px-4">
-      <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="mb-6 text-center text-2xl font-bold text-blue-600">新規登録</h1>
+    <main className="flex flex-1 items-center justify-center bg-background px-4">
+      <div className="w-full max-w-sm rounded-3xl border border-border bg-surface p-10 shadow-[0_8px_40px_rgba(0,0,0,0.08)]">
+        <h1 className="mb-8 text-center text-2xl font-semibold tracking-tight">
+          新規登録
+        </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">名前</label>
+            <label className="mb-1.5 block text-[13px] font-medium text-muted">名前</label>
             <input
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-[15px] outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/20"
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
+            <label className="mb-1.5 block text-[13px] font-medium text-muted">
               メールアドレス
             </label>
             <input
@@ -64,11 +66,11 @@ export default function RegisterPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-[15px] outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/20"
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
+            <label className="mb-1.5 block text-[13px] font-medium text-muted">
               パスワード(8文字以上)
             </label>
             <input
@@ -77,21 +79,21 @@ export default function RegisterPage() {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-[15px] outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/20"
             />
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-[13px] text-red-500">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+            className="mt-2 rounded-full bg-accent px-4 py-2.5 text-[15px] font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
           >
             {loading ? "登録中..." : "登録する"}
           </button>
         </form>
-        <p className="mt-4 text-center text-sm text-slate-500">
+        <p className="mt-6 text-center text-[13px] text-muted">
           既にアカウントをお持ちの方は{" "}
-          <Link href="/login" className="text-blue-600 hover:underline">
+          <Link href="/login" className="text-accent hover:underline">
             ログイン
           </Link>
         </p>

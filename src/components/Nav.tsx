@@ -11,29 +11,31 @@ export default function Nav() {
   if (!session) return null;
 
   const linkClass = (href: string) =>
-    `px-3 py-2 rounded-md text-sm font-medium ${
+    `rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors ${
       pathname === href
-        ? "bg-blue-600 text-white"
-        : "text-slate-600 hover:bg-slate-200"
+        ? "bg-foreground text-background"
+        : "text-muted hover:bg-foreground/5 hover:text-foreground"
     }`;
 
   return (
-    <nav className="border-b border-slate-200 bg-white">
-      <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-bold text-blue-600">シフ管</span>
-          <Link href="/dashboard" className={linkClass("/dashboard")}>
-            カレンダー
-          </Link>
-          <Link href="/workplaces" className={linkClass("/workplaces")}>
-            バイト先管理
-          </Link>
+    <nav className="glass sticky top-0 z-40 border-b border-border">
+      <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-3">
+        <div className="flex items-center gap-4">
+          <span className="text-[17px] font-semibold tracking-tight">ラクシフ</span>
+          <div className="flex items-center gap-1">
+            <Link href="/dashboard" className={linkClass("/dashboard")}>
+              カレンダー
+            </Link>
+            <Link href="/workplaces" className={linkClass("/workplaces")}>
+              バイト先管理
+            </Link>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-slate-500">{session.user?.name}</span>
+        <div className="flex items-center gap-4">
+          <span className="text-[13px] text-muted">{session.user?.name}</span>
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="text-sm text-slate-500 hover:text-red-600"
+            className="text-[13px] text-muted transition-colors hover:text-foreground"
           >
             ログアウト
           </button>

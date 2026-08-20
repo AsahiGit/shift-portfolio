@@ -19,6 +19,10 @@ export type ShiftFormValues = {
   workplaceId: string;
 };
 
+const inputClass =
+  "w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-[14px] outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/20";
+const labelClass = "mb-1.5 block text-[12px] font-medium text-muted";
+
 export default function ShiftFormModal({
   workplaces,
   initial,
@@ -39,9 +43,9 @@ export default function ShiftFormModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-lg">
-        <h2 className="mb-4 text-lg font-bold">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-3xl border border-border bg-surface p-7 shadow-[0_20px_60px_rgba(0,0,0,0.2)]">
+        <h2 className="mb-5 text-[17px] font-semibold tracking-tight">
           {values.date} のシフト{values.id ? "編集" : "追加"}
         </h2>
         <form
@@ -52,14 +56,12 @@ export default function ShiftFormModal({
           className="flex flex-col gap-4"
         >
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
-              バイト先
-            </label>
+            <label className={labelClass}>バイト先</label>
             <select
               required
               value={values.workplaceId}
               onChange={(e) => update("workplaceId", e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              className={inputClass}
             >
               <option value="">選択してください</option>
               {workplaces.map((w) => (
@@ -71,50 +73,42 @@ export default function ShiftFormModal({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">
-                開始時刻
-              </label>
+              <label className={labelClass}>開始時刻</label>
               <input
                 required
                 type="time"
                 value={values.startTime}
                 onChange={(e) => update("startTime", e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                className={inputClass}
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">
-                終了時刻
-              </label>
+              <label className={labelClass}>終了時刻</label>
               <input
                 required
                 type="time"
                 value={values.endTime}
                 onChange={(e) => update("endTime", e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                className={inputClass}
               />
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
-              休憩時間(分)
-            </label>
+            <label className={labelClass}>休憩時間(分)</label>
             <input
               type="number"
               min={0}
               value={values.breakMinutes}
               onChange={(e) => update("breakMinutes", e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              className={inputClass}
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
-              ステータス
-            </label>
+            <label className={labelClass}>ステータス</label>
             <select
               value={values.status}
               onChange={(e) => update("status", e.target.value as ShiftFormValues["status"])}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              className={inputClass}
             >
               <option value="PLANNED">希望(未確定)</option>
               <option value="CONFIRMED">確定</option>
@@ -122,13 +116,11 @@ export default function ShiftFormModal({
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
-              メモ
-            </label>
+            <label className={labelClass}>メモ</label>
             <input
               value={values.memo}
               onChange={(e) => update("memo", e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              className={inputClass}
             />
           </div>
 
@@ -138,7 +130,7 @@ export default function ShiftFormModal({
                 <button
                   type="button"
                   onClick={onDelete}
-                  className="rounded-md px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+                  className="rounded-full px-4 py-2 text-[13px] font-medium text-red-500 transition-colors hover:bg-red-50"
                 >
                   削除
                 </button>
@@ -148,13 +140,13 @@ export default function ShiftFormModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-md border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-100"
+                className="rounded-full border border-border px-4 py-2 text-[13px] font-medium text-muted transition-colors hover:bg-foreground/5"
               >
                 キャンセル
               </button>
               <button
                 type="submit"
-                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                className="rounded-full bg-accent px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-accent-hover"
               >
                 保存
               </button>
