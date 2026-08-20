@@ -64,6 +64,7 @@ http://localhost:3000 で起動します。
 ## デプロイ
 
 Vercel + Neon(サーバーレスPostgres)で無料枠のみでデプロイしています。
+GitHubリポジトリと連携済みで、`main`ブランチへのpushで自動的に本番反映されます。
 
 ## AI活用について
 
