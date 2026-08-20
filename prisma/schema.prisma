@@ -16,6 +16,8 @@ model User {
   email        String      @unique
   passwordHash String
   name         String
+  bio          String? // プロフィールの自己紹介文
+  avatarColor  String      @default("#0071e3") // アバターの背景色
   friendCode   String      @unique @default(dbgenerated("upper(substr(md5(random()::text), 1, 8))")) // 友達申請用の8桁コード
   createdAt    DateTime    @default(now())
   workplaces   Workplace[]
@@ -23,6 +25,12 @@ model User {
 
   sentFriendRequests     Friendship[] @relation("FriendshipRequester")
   receivedFriendRequests Friendship[] @relation("FriendshipAddressee")
+
+  sentMessages     Message[] @relation("MessageSender")
+  receivedMessages Message[] @relation("MessageReceiver")
+
+  ownedGroups      Group[]
+  groupMemberships GroupMember[]
 }
 
 model Friendship {
@@ -42,6 +50,46 @@ model Friendship {
 enum FriendshipStatus {
   PENDING
   ACCEPTED
+}
+
+model Message {
+  id         String    @id @default(cuid())
+  senderId   String
+  sender     User      @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId String
+  receiver   User      @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  content    String
+  readAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([senderId, receiverId])
+}
+
+model Group {
+  id        String        @id @default(cuid())
+  name      String
+  color     String        @default("#0071e3")
+  ownerId   String
+  owner     User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+  members   GroupMember[]
+
+  @@index([ownerId])
+}
+
+model GroupMember {
+  id       String   @id @default(cuid())
+  groupId  String
+  group    Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt DateTime @default(now())
+
+  @@unique([groupId, userId])
+  @@index([groupId])
+  @@index([userId])
 }
 
 model Workplace {
